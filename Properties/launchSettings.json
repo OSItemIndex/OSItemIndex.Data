@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "OSItemIndex.Observer": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

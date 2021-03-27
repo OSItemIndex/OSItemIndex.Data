@@ -1,68 +1,138 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using OSItemIndex.API.Models;
 using OSItemIndex.Observer.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
-using System.Text;
+using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using OSItemIndex.Observer.Utils;
 
 namespace OSItemIndex.Observer.Services
 {
-    class OSRSBoxService : BackgroundService
+    class OSRSBoxService : BackgroundService, IOSRSBoxBackgroundService
     {
-        private readonly ILogger<OSRSBoxService> _logger;
-        private readonly IHttpClientFactory _httpFactory;
+        private readonly IHttpClientFactory httpFactory;
 
-        public OSRSBoxService(ILogger<OSRSBoxService> log, IHttpClientFactory httpFactory)
+        public OSRSBoxService(IHttpClientFactory _httpFactory)
         {
-            _logger = log;
-            _httpFactory = httpFactory;
+            httpFactory = _httpFactory;
         }
 
-        public async Task<RMProject> GetLatestProjectDetails()
+        public async Task<HashSet<OSRSBoxItem>> GetLatestItemsAsync()
         {
-            var req = new HttpRequestMessage(HttpMethod.Get, Constants.Endpoints.OSRSBoxVersion);
-            var client = _httpFactory.CreateClient("osrsbox");
+            using (var client = httpFactory.CreateClient("osrsbox"))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, Constants.Endpoints.OSRSBoxItems))
+            using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
+            {
+                try
+                {
+                    response.EnsureSuccessStatusCode();
+                    using (var stream = await response.Content.ReadAsStreamAsync())
+                    {
+                        HashSet<OSRSBoxItem> readItems(Stream s)
+                        {
+                            var items = new HashSet<OSRSBoxItem>();
 
-            _logger.LogInformation("Sending osrsbox-version request");
-            var resp = await client.SendAsync(req);
+                            using (var jsonStreamReader = new Utf8JsonStreamReader(stream, 32 * 1024))
+                            while (jsonStreamReader.Read())
+                            {
+                                if (jsonStreamReader.CurrentDepth == 1 && jsonStreamReader.TokenType == JsonTokenType.StartObject)
+                                {
+                                    var rawJson = jsonStreamReader.DeserialiseAsString();
+                                    var item = JsonSerializer.Deserialize<OSRSBoxItem>(rawJson);
+                                    item.Document = rawJson;
+                                    items.Add(item);
+                                }
+                            }
+                            return items;
+                        }
+                        return readItems(stream);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Log.Error(exception, "StatusCode: {@StatusCode}", response.StatusCode);
+                }
+                return new HashSet<OSRSBoxItem>();
+            }
+        }
 
-            try
+        public async Task<RealtimeMonitoringProject> GetLatestProjectDetailsAsync()
+        {
+            using (var client = httpFactory.CreateClient("osrsbox"))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, Constants.Endpoints.OSRSBoxVersion))
+            using (var response = await client.SendAsync(request))
             {
-                resp.EnsureSuccessStatusCode(); // throw exception
-            } catch (HttpRequestException e)
-            {
-                _logger.LogError("HttpRequest exception {@ExceptionStr}", e.ToString());
-                _logger.LogDebug("HttpRequest exception {@StatusCode}, {@ReasonPhrase}, {@ReqMessage}", resp.StatusCode, resp.ReasonPhrase, resp.RequestMessage);
-                return new RMProject();
+                var content = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    response.EnsureSuccessStatusCode();
+                    return JsonSerializer.Deserialize<RealtimeMonitoringProject>(content);
+                }
+                catch (Exception exception)
+                {
+                    Log.Error(exception, "StatusCode: {@StatusCode}, Content: {@Content}", response.StatusCode, content);
+                }
             }
-            
-            _logger.LogInformation("Response recieved {@StatusCode}", resp.StatusCode);
-            var content = await resp.Content.ReadAsStringAsync();
-            try
+            return new RealtimeMonitoringProject();
+        }
+
+        public async Task<int> PostItemsAsync(IEnumerable<OSRSBoxItem> items)
+        {
+            using (var client = httpFactory.CreateClient("osrsbox"))
+            using (var request = new HttpRequestMessage(HttpMethod.Post, Constants.Endpoints.OSItemIndexAPIPost)
             {
-                var project = JsonConvert.DeserializeObject<RMProject>(content);
-                return project;
-            } catch (JsonException e)
+                Content = JsonContent.Create(items)
+            })
+            using (var response = await client.SendAsync(request))
             {
-                _logger.LogError("JsonException thrown {@ExceptionStr}", e.ToString());
-                _logger.LogDebug("JsonException content {@Content}", content);
+                var content = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    response.EnsureSuccessStatusCode();
+                    return int.Parse(content);
+                }
+                catch (Exception exception)
+                {
+                    Log.Error(exception, "StatusCode: {@StatusCode}, Content: {@Content}", response.StatusCode, content);
+                }
             }
-            return new RMProject();
+            return 0;
+        }
+
+        public async Task<bool> TriggerUpdateAsync()
+        {
+            var project = await GetLatestProjectDetailsAsync();
+            var items = await GetLatestItemsAsync();
+
+            Log.Information("Latest OSRSBox project details > v{@Version} and {@Count} item records", project.Version, items.Count);
+            var itemsAdded = await PostItemsAsync(items);
+            return itemsAdded > 0;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("OSRSBoxService is starting");
+            Log.Information("OSRSBoxService is starting");
 
-            stoppingToken.Register(() => _logger.LogInformation("OSRSBoxService background service is stopping"));
+            stoppingToken.Register(() => Log.Information("OSRSBoxService background service is stopping"));
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var project = await GetLatestProjectDetails();
+                await TriggerUpdateAsync();
+
+
+                // Delay every 10 minutes
+                // Trigger post if
+                    // database is empty
+                    // database item record amount does not match osrsbox's
+                    // osrsbox version has changed
+
+                //Log.Information("Fetched latest osrsbox project details {@Version} - {@Items}", project.Version, items.Count);
 
                 // delay by a day, maybe 2-12 hours if the latest project version is latest
                 // trigger if the database is empty
@@ -75,20 +145,7 @@ namespace OSItemIndex.Observer.Services
                 await Task.Delay(60000, stoppingToken);
             }
 
-            _logger.LogInformation("OSRSBoxService background service is stopping"));
-
-            /*logger.LogInformation($"GracePeriodManagerService is starting.");
-
-            stoppingToken.Register(() => logger.LogInformation($" GracePeriod background task is stopping."));
-
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                logger.LogInformation($"GracePeriod task doing background work.");
-
-                await Task.Delay(60000, stoppingToken);
-            }
-
-            logger.LogInformation($"GracePeriod background task is stopping.");*/
+            Log.Information("OSRSBoxService background service is stopping");
         }
     }
 }
