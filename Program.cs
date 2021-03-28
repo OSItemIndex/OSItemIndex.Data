@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
@@ -36,7 +35,10 @@ namespace OSItemIndex.Observer
 
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddHttpClient();
+                    // Use our own HttpMessageHandler so we can intercept and add any overrides that should be applied to all our requests, like our User-Agent
+                    services.AddTransient<ObserverHttpMessageHandler>();
+                    services.AddHttpClient("osrsbox").AddHttpMessageHandler<ObserverHttpMessageHandler>();
+
                     services.AddHostedService<OSRSBoxService>();
                 });
         }

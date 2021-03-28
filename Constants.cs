@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace OSItemIndex.Observer
+﻿namespace OSItemIndex.Observer
 {
     public class Constants
     {
@@ -12,6 +8,10 @@ namespace OSItemIndex.Observer
             public const string OSRSBoxItems = "https://www.osrsbox.com/osrsbox-db/items-complete.json"; // static json-api
 
             public const string OSItemIndexAPIPost = "https://localhost:5001/api/items";
+            public const string OSItemIndexAPIStats = "https://localhost:5001/api/items/stats";
         }
+
+        // Our user-agent all requests use so we can easily be identified and contacted
+        public const string OSItemIndexObserverUserAgent = "OSItemIndex + OSItemIndex.Observer/1.00 + github.com/OSItemIndex";
     }
 }

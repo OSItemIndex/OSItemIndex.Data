@@ -10,10 +10,12 @@ namespace OSItemIndex.Observer.Services
 {
     public interface IOSRSBoxBackgroundService
     {
+        Task<ItemsStatisics> GetAPIItemStatisticsAsync();
         Task<RealtimeMonitoringProject> GetLatestProjectDetailsAsync();
         Task<HashSet<OSRSBoxItem>> GetLatestItemsAsync();
-        Task<int> PostItemsAsync(IEnumerable<OSRSBoxItem> items);
+        Task<bool> PostItemsAsync(IEnumerable<OSRSBoxItem> items);
 
-        Task<bool> TriggerUpdateAsync();
+        Task<bool> ShouldUpdate();
+        Task<bool> UpdateItemsAsync();      
     }
 }

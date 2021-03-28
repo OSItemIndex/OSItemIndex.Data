@@ -174,9 +174,10 @@ namespace OSItemIndex.Observer.Utils
         {
             var tokenStartIndex = DeserialisePre(out var firstSegment, out var firstSegmentStartIndex);
             var seq = new ReadOnlySequence<byte>(firstSegment!, firstSegmentStartIndex, _lastSegment!, _lastSegmentEndIndex).Slice(tokenStartIndex, _jsonReader.Position);
+            var str = Encoding.ASCII.GetString(seq.ToArray());
 
             DeserialisePost();
-            return Encoding.ASCII.GetString(seq.ToArray());
+            return str;
         }
 
         public JsonDocument GetJsonDocument()
