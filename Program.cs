@@ -37,9 +37,12 @@ namespace OSItemIndex.Observer
                 {
                     // Use our own HttpMessageHandler so we can intercept and add any overrides that should be applied to all our requests, like our User-Agent
                     services.AddTransient<ObserverHttpMessageHandler>();
-                    services.AddHttpClient("osrsbox").AddHttpMessageHandler<ObserverHttpMessageHandler>();
 
-                    services.AddHostedService<OSRSBoxService>();
+                    services.AddHttpClient("osrsbox").AddHttpMessageHandler<ObserverHttpMessageHandler>();
+                    services.AddHttpClient("wikiRealtime").AddHttpMessageHandler<ObserverHttpMessageHandler>();
+
+                    //services.AddHostedService<OSRSBoxService>();
+                    services.AddHostedService<WikiRealtimePriceService>();
                 });
         }
     }

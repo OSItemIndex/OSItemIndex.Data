@@ -25,7 +25,7 @@ namespace OSItemIndex.Observer.Services
             _httpFactory = httpFactory;
         }
 
-        public async Task<ItemsStatisics> GetAPIItemStatisticsAsync()
+        public async Task<ItemsStatisics> GetItemStatisticsAsync()
         {
             using (var client = _httpFactory.CreateClient("osrsbox"))
             using (var request = new HttpRequestMessage(HttpMethod.Get, Constants.Endpoints.OSItemIndexAPIStats))
@@ -137,7 +137,7 @@ namespace OSItemIndex.Observer.Services
                 return true;
             }
 
-            var itemsStats = await GetAPIItemStatisticsAsync();
+            var itemsStats = await GetItemStatisticsAsync();
             if (_lastNumberOfItemRecords != itemsStats.TotalItemRecords)
             {
                 return true;
