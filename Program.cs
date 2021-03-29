@@ -39,10 +39,10 @@ namespace OSItemIndex.Observer
                     services.AddTransient<ObserverHttpMessageHandler>();
 
                     services.AddHttpClient("osrsbox").AddHttpMessageHandler<ObserverHttpMessageHandler>();
-                    services.AddHttpClient("wikiRealtime").AddHttpMessageHandler<ObserverHttpMessageHandler>();
+                    services.AddHttpClient("realtime").AddHttpMessageHandler<ObserverHttpMessageHandler>();
 
                     //services.AddHostedService<OSRSBoxService>();
-                    services.AddHostedService<WikiRealtimePriceService>();
+                    services.AddHostedService<RealtimePriceService>();
                 });
         }
     }

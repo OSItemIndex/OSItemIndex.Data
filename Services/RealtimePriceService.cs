@@ -4,37 +4,27 @@ using OSItemIndex.Observer.Utils;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Collections;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OSItemIndex.Observer.Services
 {  
-    public class WikiRealtimePriceService : BackgroundService, IWikiRealtimePriceBackgroundService
+    public class RealtimePriceService : BackgroundService, IRealtimePriceBackgroundService
     {
         private readonly IHttpClientFactory _httpFactory;
 
-        public WikiRealtimePriceService(IHttpClientFactory httpFactory)
+        public RealtimePriceService(IHttpClientFactory httpFactory)
         {
             _httpFactory = httpFactory;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="endPoint"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<T>> DeserializePricingModelAsync<T>(string endPoint) where T : IWikiRealtimePricingModel
+        public async Task<IEnumerable<RealtimePrice>> DeserializePricingModelAsync(Realtime.RequestType requestType)
         {
-            using (var client = _httpFactory.CreateClient("wikiRealtime"))
-            using (var request = new HttpRequestMessage(HttpMethod.Get, endPoint))
+            using (var client = _httpFactory.CreateClient("realtime"))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, Realtime.RequestEndpoints[requestType]))
             using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
             {
                 try
@@ -42,15 +32,16 @@ namespace OSItemIndex.Observer.Services
                     response.EnsureSuccessStatusCode();
                     using (var stream = await response.Content.ReadAsStreamAsync())
                     {
-                        HashSet<T> readContent(Stream s)
+                        HashSet<RealtimePrice> readContent(Stream s)
                         {
                             var lastItemId = -1;
                             long? foundTimestamp = null;
-                            var prices = new HashSet<T>();
+                            var prices = new HashSet<RealtimePrice>();
                             using (var jsonStreamReader = new Utf8JsonStreamReader(s, 32 * 1024))
                             {
                                 while (jsonStreamReader.Read())
                                 {
+                                    // TODO ~ Write a unit test for confirming the depth
                                     if (jsonStreamReader.CurrentDepth == 2)
                                     {
                                         switch (jsonStreamReader.TokenType)
@@ -61,11 +52,24 @@ namespace OSItemIndex.Observer.Services
                                             case JsonTokenType.StartObject: // object
                                                 if (lastItemId > -1)
                                                 {
-                                                    var price = jsonStreamReader.Deserialise<T>();
-
-                                                    price.Id = lastItemId;
+                                                    var price = new RealtimePrice() { Id = lastItemId };
                                                     lastItemId = -1;
+                                                    switch (requestType)
+                                                    {
+                                                        case Realtime.RequestType.Latest:
+                                                            price.Latest = jsonStreamReader.Deserialise<RealtimePrice.LatestPrice>();
+                                                            break;
 
+                                                        case Realtime.RequestType.FiveMinute:
+                                                            price.FiveMinute = jsonStreamReader.Deserialise<RealtimePrice.AveragePrice>();
+                                                            break;
+
+                                                        case Realtime.RequestType.OneHour:
+                                                            price.OneHour = jsonStreamReader.Deserialise<RealtimePrice.AveragePrice>();
+                                                            break;
+
+                                                        default: break;
+                                                    }
                                                     prices.Add(price);
                                                 }
                                                 break;
@@ -78,10 +82,23 @@ namespace OSItemIndex.Observer.Services
                                 }
                             }
 
-                            if (foundTimestamp != null && typeof(T) == typeof(WikiRealtimePrice.AveragePrice))
+                            if (foundTimestamp != null)
                             {
                                 foreach (var price in prices)
-                                    (price as WikiRealtimePrice.AveragePrice).Timestamp = foundTimestamp;
+                                {
+                                    switch (requestType)
+                                    {
+                                        case Realtime.RequestType.FiveMinute:
+                                            price.FiveMinute.Timestamp = foundTimestamp;
+                                            break;
+
+                                        case Realtime.RequestType.OneHour:
+                                            price.OneHour.Timestamp = foundTimestamp;
+                                            break;
+
+                                        default: break;
+                                    }
+                                }
                             }
 
                             return prices;
@@ -94,25 +111,22 @@ namespace OSItemIndex.Observer.Services
                     Log.Error(exception, "StatusCode: {@StatusCode}", response.StatusCode);
                 }
             }
-            return new HashSet<T>();
-        }
+            return new HashSet<RealtimePrice>();
+        }      
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            Log.Information("WikiRealtimePriceService is starting");
+            Log.Information("RealtimePriceService is starting");
 
-            stoppingToken.Register(() => Log.Information("WikiRealtimePriceService background service is stopping"));
+            stoppingToken.Register(() => Log.Information("RealtimePriceService background service is stopping"));
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var latest = await DeserializePricingModelAsync<WikiRealtimePrice.LatestPrice>(Constants.Endpoints.WikiRealtimePriceLatest);
-                var fiveMinute = await DeserializePricingModelAsync<WikiRealtimePrice.AveragePrice>(Constants.Endpoints.WikiRealtimePriceFiveMin);
-                var oneHour = await DeserializePricingModelAsync<WikiRealtimePrice.AveragePrice>(Constants.Endpoints.WikiRealtimePriceOneHour);
 
                 await Task.Delay(60000, stoppingToken);
             }
 
-            Log.Information("WikiRealtimePriceService background service is stopping");
+            Log.Information("RealtimePriceService background service is stopping");
         }
     }
 }
