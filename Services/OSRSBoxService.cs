@@ -28,7 +28,7 @@ namespace OSItemIndex.Observer.Services
         public async Task<ItemsStatisics> GetItemStatisticsAsync()
         {
             using (var client = _httpFactory.CreateClient("osrsbox"))
-            using (var request = new HttpRequestMessage(HttpMethod.Get, Constants.Endpoints.OSItemIndexAPIStats))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, Endpoints.OSItemIndex.ItemsStatistics))
             using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
             {
                 var content = await response.Content.ReadAsStringAsync();
@@ -48,7 +48,7 @@ namespace OSItemIndex.Observer.Services
         public async Task<HashSet<OSRSBoxItem>> GetLatestItemsAsync()
         {
             using (var client = _httpFactory.CreateClient("osrsbox"))
-            using (var request = new HttpRequestMessage(HttpMethod.Get, Constants.Endpoints.OSRSBoxItems))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, Endpoints.OSRSBox.ItemsComplete))
             using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
             {
                 try
@@ -88,7 +88,7 @@ namespace OSItemIndex.Observer.Services
         public async Task<RealtimeMonitoringProject> GetLatestProjectDetailsAsync()
         {
             using (var client = _httpFactory.CreateClient("osrsbox"))
-            using (var request = new HttpRequestMessage(HttpMethod.Get, Constants.Endpoints.OSRSBoxVersion))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, Endpoints.OSRSBox.Project))
             using (var response = await client.SendAsync(request))
             {
                 var content = await response.Content.ReadAsStringAsync();
@@ -108,7 +108,7 @@ namespace OSItemIndex.Observer.Services
         public async Task<bool> PostItemsAsync(IEnumerable<OSRSBoxItem> items)
         {
             using (var client = _httpFactory.CreateClient("osrsbox"))
-            using (var request = new HttpRequestMessage(HttpMethod.Post, Constants.Endpoints.OSItemIndexAPIPost)
+            using (var request = new HttpRequestMessage(HttpMethod.Post, Endpoints.OSItemIndex.Items)
             {
                 Content = JsonContent.Create(items)
             })
