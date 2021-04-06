@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using OSItemIndex.AggregateService;
 using OSItemIndex.Aggregator.OSRSBox.Models;
+using OSItemIndex.Models;
 
 namespace OSItemIndex.Aggregator.OSRSBox
 {
@@ -17,7 +18,7 @@ namespace OSItemIndex.Aggregator.OSRSBox
             _httpFactory = httpFactory;
         }
 
-        public async Task<IEnumerable<OSRSBoxItem>> GetItemsAsync()
+        public async Task<IEnumerable<OsrsBoxItem>> GetItemsAsync()
         {
             throw new NotImplementedException();
         }

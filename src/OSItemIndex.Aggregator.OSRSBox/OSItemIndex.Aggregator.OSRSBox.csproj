@@ -17,7 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\OSItemIndex.AggregateService\OSItemIndex.AggregateService.csproj" />
-      <ProjectReference Include="..\OSItemIndex.API\OSItemIndex.API.csproj" />
+      <ProjectReference Include="..\OSItemIndex.Models\OSItemIndex.Models.csproj" />
     </ItemGroup>
 
     <ItemGroup>
