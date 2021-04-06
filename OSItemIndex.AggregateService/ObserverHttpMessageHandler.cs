@@ -2,11 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OSItemIndex.Observer.Services
+namespace OSItemIndex.AggregateService
 {
     public class ObserverHttpMessageHandler : DelegatingHandler
     {
-        protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             request.Headers.Add("User-Agent", Constants.ObserverUserAgent);
             return await base.SendAsync(request, cancellationToken);

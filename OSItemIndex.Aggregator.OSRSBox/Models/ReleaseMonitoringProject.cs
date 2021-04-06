@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace OSItemIndex.Observer.Models
+namespace OSItemIndex.Aggregator.OSRSBox.Models
 {
     /// <summary>
     /// https://release-monitoring.org/api/{projectid} response model.
     /// </summary>
-    public class RealtimeMonitoringProject
+    public class ReleaseMonitoringProject
     {
         [JsonPropertyName("backend")]
         public string Backend { get; set; }

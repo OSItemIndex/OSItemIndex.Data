@@ -10,8 +10,8 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 
-namespace OSItemIndex.Observer.Utils
-{    
+namespace OSItemIndex.AggregateService.Utils
+{
     // Taken from https://stackoverflow.com/questions/54983533/parsing-a-json-file-with-net-core-3-0-system-text-json
     // and fixed a few bugs with that
     public ref struct Utf8JsonStreamReader
@@ -80,7 +80,7 @@ namespace OSItemIndex.Observer.Utils
             var newSegment = new SequenceSegment(_bufferSize, _lastSegment);
             _lastSegment?.SetNext(newSegment);
             _lastSegment = newSegment;
-            
+
             if (_firstSegment == null)
             {
                 _firstSegment = newSegment;
@@ -121,12 +121,12 @@ namespace OSItemIndex.Observer.Utils
                 _firstSegment = firstSegment;
                 _firstSegmentStartIndex = firstSegmentStartIndex;
                 var data = new ReadOnlySequence<byte>(_firstSegment!, _firstSegmentStartIndex, _lastSegment!,
-                    _lastSegmentEndIndex); 
+                    _lastSegmentEndIndex);
                 _jsonReader =
                     new Utf8JsonReader(data, _isFinalBlock, _jsonReader.CurrentState);
             }
         }
-        
+
         private long DeserialisePre(out SequenceSegment? firstSegment, out int firstSegmentStartIndex)
         {
             // JsonSerializer.Deserialize can read only a single object. We have to extract
@@ -191,7 +191,7 @@ namespace OSItemIndex.Observer.Utils
 
             // deserialize value
             var result = JsonDocument.ParseValue(ref newJsonReader);
-            DeserialisePost();        
+            DeserialisePost();
             return result;
         }
 
