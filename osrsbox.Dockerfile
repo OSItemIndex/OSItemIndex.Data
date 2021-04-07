@@ -7,17 +7,12 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY *.sln .
-COPY OSItemIndex.Aggregator.OSRSBox/*.csproj ./OSItemIndex.Aggregator.OSRSBox/
-COPY OSItemIndex.AggregateService/*.csproj ./OSItemIndex.AggregateService/
-COPY OSItemIndex.API/*.csproj ./OSItemIndex.API/
-RUN dotnet restore
-
-COPY OSItemIndex.Aggregator.OSRSBox/. ./OSItemIndex.Aggregator.OSRSBox/
-COPY OSItemIndex.AggregateService/. ./OSItemIndex.AggregateService/
-COPY OSItemIndex.API/. ./OSItemIndex.API/
-
-WORKDIR "/src/OSItemIndex.Aggregator.OSRSBox"
+COPY ["src/OSItemIndex.Aggregator.OSRSBox/OSItemIndex.Aggregator.OSRSBox.csproj", "src/OSItemIndex.Aggregator.OSRSBox/"]
+COPY ["src/OSItemIndex.AggregateService/OSItemIndex.AggregateService.csproj", "src/OSItemIndex.AggregateService/"]
+COPY ["src/OSItemIndex.Models/OSItemIndex.Models.csproj", "src/OSItemIndex.Models/"]
+RUN dotnet restore "src/OSItemIndex.Aggregator.OSRSBox/OSItemIndex.Aggregator.OSRSBox.csproj"
+COPY . .
+WORKDIR "/src/src/OSItemIndex.Aggregator.OSRSBox"
 RUN dotnet build "OSItemIndex.Aggregator.OSRSBox.csproj" -c Release -o /app/build
 
 FROM build AS publish

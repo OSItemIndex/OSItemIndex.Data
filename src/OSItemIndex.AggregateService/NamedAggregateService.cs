@@ -11,16 +11,17 @@ namespace OSItemIndex.AggregateService
     /// </summary>
     public abstract class NamedAggregateService : IHostedService, IDisposable
     {
-        private readonly string _name;
+        public readonly string Name;
         private readonly TimeSpan? _executeDelay;
 
         private Task _loopingTask;
         private Task _executingTask;
-        private CancellationTokenSource _stoppingCts;
+        private CancellationTokenSource _stoppingStartCts;
+        private CancellationTokenSource _stoppingLoopCts;
 
         protected NamedAggregateService(string name, TimeSpan? executeDelay = null)
         {
-            _name = name;
+            Name = name;
             _executeDelay = executeDelay;
         }
 
@@ -31,10 +32,10 @@ namespace OSItemIndex.AggregateService
         public virtual Task StartAsync(CancellationToken cancellationToken)
         {
             // Create linked token to allow cancelling executing task from provided token
-            _stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _stoppingStartCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             // Store the task we're executing
-            _loopingTask = LoopAsync(_stoppingCts.Token);
+            _loopingTask = LoopAsync(_stoppingStartCts.Token);
 
             // If the task is completed then return it, this will bubble cancellation and failure to the caller
             return _loopingTask.IsCompleted ? _loopingTask : Task.CompletedTask; // Otherwise it's running
@@ -46,20 +47,24 @@ namespace OSItemIndex.AggregateService
         /// <param name="cancellationToken">Indicates that the loop process should be aborted.</param>
         private async Task<Task> LoopAsync(CancellationToken cancellationToken)
         {
-            Log.Information("{@_name} aggregate service is starting", _name);
+            _stoppingLoopCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            cancellationToken.Register(() => Log.Information("{@_name} aggregate service is stopping", _name));
+            Log.Information("{@Name} aggregate service is starting", Name);
 
-            while (!cancellationToken.IsCancellationRequested)
+            _stoppingLoopCts.Token.Register(() => Log.Information("{@Name} aggregate service is stopping", Name));
+
+            while (!_stoppingLoopCts.Token.IsCancellationRequested)
             {
-                _executingTask = ExecuteAsync(_stoppingCts.Token); // Store the task we're executing
+                _executingTask = ExecuteAsync(_stoppingLoopCts.Token); // Store the task we're executing
+                await _executingTask;
+
                 if (_executeDelay != null)
                 {
-                    await Task.Delay(_executeDelay.Value, cancellationToken);
+                    await Task.Delay(_executeDelay.Value, _stoppingLoopCts.Token);
                 }
             }
 
-            Log.Information("{@_name} aggregate service is stopping", _name);
+            Log.Information("{@Name} aggregate service is stopping", Name);
 
             // If the task is completed then return it, this will bubble cancellation and failure to the caller
             return _executingTask.IsCompleted ? _executingTask : Task.CompletedTask; // Otherwise it's running
@@ -88,7 +93,8 @@ namespace OSItemIndex.AggregateService
             try
             {
                 // Signal cancellation to the executing method
-                _stoppingCts.Cancel();
+                _stoppingStartCts.Cancel();
+                _stoppingLoopCts.Cancel();
             }
             finally
             {
@@ -99,7 +105,8 @@ namespace OSItemIndex.AggregateService
 
         public virtual void Dispose()
         {
-            _stoppingCts?.Cancel();
+            _stoppingStartCts?.Cancel();
+            _stoppingLoopCts?.Cancel();
         }
     }
 }

@@ -1,5 +1,10 @@
 ﻿namespace OSItemIndex.AggregateService
 {
+    public enum DatabaseKeys : int
+    {
+        OsrsBox
+    }
+
     public class Constants
     {
         // Our user-agent all requests use so we can easily be identified and contacted

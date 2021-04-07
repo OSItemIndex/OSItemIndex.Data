@@ -4,15 +4,11 @@
         <TargetFramework>net5.0</TargetFramework>
         <UserSecretsId>8c4d45bf-f3cf-49f6-a030-5fa5eec7168f</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileContext>..\..</DockerfileContext>
     </PropertyGroup>
 
     <ItemGroup>
       <Folder Include="Controllers" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.13" />
-      <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
     </ItemGroup>
 
     <ItemGroup>
@@ -24,6 +20,10 @@
       <_ContentIncludedByDefault Remove="build\OSItemIndex.Aggregator.OSRSBox\Debug\obj\OSItemIndex.Aggregator.OSRSBox.csproj.nuget.dgspec.json" />
       <_ContentIncludedByDefault Remove="build\OSItemIndex.Aggregator.OSRSBox\Debug\obj\project.assets.json" />
       <_ContentIncludedByDefault Remove="build\OSItemIndex.Aggregator.OSRSBox\Debug\obj\project.packagespec.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.13" />
     </ItemGroup>
 
 </Project>

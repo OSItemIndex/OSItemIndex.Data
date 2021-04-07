@@ -7,7 +7,7 @@ namespace OSItemIndex.Aggregator.OSRSBox
 {
     public interface IOsrsBoxService
     {
-        Task<IEnumerable<OsrsBoxItem>> GetItemsAsync();
+        Task AggregateAndSetItemsAsync();
         Task<ReleaseMonitoringProject> GetReleaseMonitoringProjectAsync();
     }
 }

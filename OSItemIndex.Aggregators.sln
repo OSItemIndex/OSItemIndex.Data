@@ -1,16 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSItemIndex.AggregateService", "OSItemIndex.AggregateService\OSItemIndex.AggregateService.csproj", "{C1DFC3E1-19AC-470D-97B4-DCFB384D0660}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSItemIndex.Aggregator.OSRSBox", "OSItemIndex.Aggregator.OSRSBox\OSItemIndex.Aggregator.OSRSBox.csproj", "{083BD0B9-7B60-4733-ACA8-9AB7D8D24AA4}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{40898C0A-DE9A-4C39-880D-DA0470081E02}"
 ProjectSection(SolutionItems) = preProject
 	.dockerignore = .dockerignore
 	.gitattributes = .gitattributes
 	.gitignore = .gitignore
-	Dockerfile = Dockerfile
+	osrsbox.dockerfile = osrsbox.dockerfile
+	..\docker-compose.yml = ..\docker-compose.yml
 EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSItemIndex.AggregateService", "src\OSItemIndex.AggregateService\OSItemIndex.AggregateService.csproj", "{48B08810-5B2C-43EB-A284-B37226E8271C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSItemIndex.Models", "src\OSItemIndex.Models\OSItemIndex.Models.csproj", "{6AD5D1D2-5B1F-4740-B579-FE8B7248A97E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSItemIndex.Aggregator.OSRSBox", "src\OSItemIndex.Aggregator.OSRSBox\OSItemIndex.Aggregator.OSRSBox.csproj", "{05EF152F-3535-4889-9AD1-868E76BD8650}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,13 +21,17 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C1DFC3E1-19AC-470D-97B4-DCFB384D0660}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C1DFC3E1-19AC-470D-97B4-DCFB384D0660}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C1DFC3E1-19AC-470D-97B4-DCFB384D0660}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C1DFC3E1-19AC-470D-97B4-DCFB384D0660}.Release|Any CPU.Build.0 = Release|Any CPU
-		{083BD0B9-7B60-4733-ACA8-9AB7D8D24AA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{083BD0B9-7B60-4733-ACA8-9AB7D8D24AA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{083BD0B9-7B60-4733-ACA8-9AB7D8D24AA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{083BD0B9-7B60-4733-ACA8-9AB7D8D24AA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48B08810-5B2C-43EB-A284-B37226E8271C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48B08810-5B2C-43EB-A284-B37226E8271C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48B08810-5B2C-43EB-A284-B37226E8271C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48B08810-5B2C-43EB-A284-B37226E8271C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AD5D1D2-5B1F-4740-B579-FE8B7248A97E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AD5D1D2-5B1F-4740-B579-FE8B7248A97E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AD5D1D2-5B1F-4740-B579-FE8B7248A97E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AD5D1D2-5B1F-4740-B579-FE8B7248A97E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05EF152F-3535-4889-9AD1-868E76BD8650}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05EF152F-3535-4889-9AD1-868E76BD8650}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05EF152F-3535-4889-9AD1-868E76BD8650}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05EF152F-3535-4889-9AD1-868E76BD8650}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
