@@ -37,16 +37,10 @@ namespace OSItemIndex.Aggregator.OSRSBox
                 try
                 {
                     response.EnsureSuccessStatusCode();
-                    await Task.Delay(10000);
+                    await Task.Delay(10000); // buffer time for snapshots to debug
                     using(var stream = await response.Content.ReadAsStreamAsync())
                     {
-                        ReadContentStream(stream,
-                                          async json =>
-                                          {
-                                              //var root = json.RootElement;
-                                              //var id = root.GetProperty("id").ToString();
-                                              //await _database.Database.JsonSetAsync(id, root.GetRawText());
-                                          });
+                        ReadContentStream(stream);
                     }
                 }
                 catch (Exception exception)
@@ -56,7 +50,7 @@ namespace OSItemIndex.Aggregator.OSRSBox
             }
             Log.Information("{@Name} aggregator service finished aggregating osrsbox-items", Name);
 
-            void ReadContentStream(Stream stream, Action<JsonDocument> action)
+            void ReadContentStream(Stream stream)
             {
                 using var jSr = new Utf8JsonStreamReader(stream, 32 * 1024);
                 while (jSr.Read())
