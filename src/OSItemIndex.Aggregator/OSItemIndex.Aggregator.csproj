@@ -2,23 +2,22 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <OutputType>Library</OutputType>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-      <PackageReference Include="NReJSON" Version="3.2.0" />
       <PackageReference Include="Serilog" Version="2.10.0" />
       <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
       <PackageReference Include="Serilog.Exceptions" Version="6.1.0" />
       <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
       <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
       <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-      <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
-      <PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="6.4.5" />
-      <PackageReference Include="StackExchange.Redis.Extensions.Core" Version="6.4.5" />
-      <PackageReference Include="StackExchange.Redis.Extensions.System.Text.Json" Version="6.4.5" />
-      <PackageReference Include="Winton.Extensions.Configuration.Consul" Version="3.1.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OSItemIndex.Data\OSItemIndex.Data.csproj" />
     </ItemGroup>
 
 </Project>

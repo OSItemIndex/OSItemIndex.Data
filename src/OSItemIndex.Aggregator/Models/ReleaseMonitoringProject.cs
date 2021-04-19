@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace OSItemIndex.Aggregator.OSRSBox.Models
+namespace OSItemIndex.Aggregator
 {
     /// <summary>
     /// https://release-monitoring.org/api/{projectid} response model.

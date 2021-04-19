@@ -10,7 +10,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 
-namespace OSItemIndex.AggregateService.Utils
+namespace OSItemIndex.Aggregator.Utils
 {
     // Taken from https://stackoverflow.com/questions/54983533/parsing-a-json-file-with-net-core-3-0-system-text-json
     // and fixed a few bugs with that
@@ -188,7 +188,6 @@ namespace OSItemIndex.AggregateService.Utils
                 new Utf8JsonReader(new ReadOnlySequence<byte>(firstSegment!, firstSegmentStartIndex, _lastSegment!,
                     _lastSegmentEndIndex).Slice(tokenStartIndex, _jsonReader.Position), true, default);
 
-
             // deserialize value
             var result = JsonDocument.ParseValue(ref newJsonReader);
             DeserialisePost();
@@ -218,7 +217,7 @@ namespace OSItemIndex.AggregateService.Utils
         public long GetInt64() => _jsonReader.GetInt64();
         public sbyte GetSByte() => _jsonReader.GetSByte();
         public float GetSingle() => _jsonReader.GetSingle();
-        public string GetString() => _jsonReader.GetString();
+        public string? GetString() => _jsonReader.GetString();
         public uint GetUInt32() => _jsonReader.GetUInt32();
         public ulong GetUInt64() => _jsonReader.GetUInt64();
         public bool TryGetDecimal(out byte value) => _jsonReader.TryGetByte(out value);

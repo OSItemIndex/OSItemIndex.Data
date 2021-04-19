@@ -1,13 +1,8 @@
-﻿namespace OSItemIndex.AggregateService
+﻿namespace OSItemIndex.Aggregator
 {
-    public enum DatabaseKeys : int
-    {
-        OsrsBox
-    }
-
     public class Constants
     {
-        // Our user-agent all requests use so we can easily be identified and contacted
+        // Our user-agent all requests use so we can easily be identified
         public const string ObserverUserAgent = "OSItemIndex + OSItemIndex.Services/1.00 + github.com/OSItemIndex + Twinki#0001";
     }
 
