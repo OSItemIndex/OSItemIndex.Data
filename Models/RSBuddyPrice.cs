@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace OSItemIndex.Data
+namespace OsItemIndex.Data
 {
     public class RsBuddyPrice : PriceEntity
     {

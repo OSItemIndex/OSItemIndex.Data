@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace OSItemIndex.Data
+namespace OsItemIndex.Data
 {
     public class ItemEntity
     {
@@ -12,12 +12,12 @@ namespace OSItemIndex.Data
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [JsonPropertyName("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
         /// The name of the item.
         /// </summary>
         [JsonPropertyName("name")]
-        public string? Name { get; set; }
+        public string Name { get; set; }
     }
 }

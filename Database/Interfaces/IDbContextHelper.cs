@@ -1,6 +1,6 @@
-﻿using static OSItemIndex.Data.Database.DbContextHelper;
+﻿using static OsItemIndex.Data.Database.DbContextHelper;
 
-namespace OSItemIndex.Data.Database
+namespace OsItemIndex.Data.Database
 {
     public interface IDbContextHelper
     {

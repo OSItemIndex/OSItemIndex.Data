@@ -15,36 +15,35 @@ using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using OSItemIndex.Data.Extensions;
 
-namespace OSItemIndex.Data.Database
+namespace OsItemIndex.Data.Database
 {
     /// <summary>
     ///     IDesignTimeDbContextFactory implementation that's used by design-time services.
     ///     https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.design.idesigntimedbcontextfactory-1?view=efcore-5.0
     /// </summary>
-    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<OSItemIndexDbContext>
+    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<OsItemIndexDbContext>
     {
         /// <summary>
         ///     Creates a new instance of a OSItemIndexDbContext.
         /// </summary>
         /// <returns>A new instance of OSItemIndexDbContext.</returns>
-        public OSItemIndexDbContext CreateDbContext(string[] args) // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#evcp
+        public OsItemIndexDbContext CreateDbContext(string[] args) // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#evcp
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            var configuration = new ConfigurationBuilder() // TODO Consider consting this somewhere, keep it all in once place, honestly prob not
+
+            var configuration = new ConfigurationBuilder()
                                 .SetBasePath(Directory.GetCurrentDirectory())
                                 .AddJsonFile("appsettings.json", true, true)
                                 .AddJsonFile($"appsettings.{environment}.json", true)
-                                .AddKeyPerFile("/run/secrets", true) // docker secrets dir
                                 .AddEnvironmentVariables()
                                 .Build();
 
-            var connStrBuilder = DatabaseExtensions.NpgsqlConnectionStringFromConfig(configuration);
+            var dbOptions = configuration.Get<DbOptions>();
+            var builder = new DbContextOptionsBuilder<OsItemIndexDbContext>();
 
-            var builder = new DbContextOptionsBuilder<OSItemIndexDbContext>()
-                .UseNpgsql(connStrBuilder.ConnectionString, o => o.CommandTimeout(7200));
-            return new OSItemIndexDbContext(builder.Options);
+            builder.UseNpgsql(dbOptions.DbConnectionString, o => o.CommandTimeout(7200));
+            return new OsItemIndexDbContext(builder.Options);
         }
     }
 }
