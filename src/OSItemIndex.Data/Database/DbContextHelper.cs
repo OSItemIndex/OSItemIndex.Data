@@ -24,7 +24,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace OSItemIndex.Data.Database
+namespace OsItemIndex.Data.Database
 {
     public class DbContextHelper : IDbContextHelper
     {
@@ -46,19 +46,19 @@ namespace OSItemIndex.Data.Database
         public class DbContextFactory : IDisposable
         {
             private readonly IServiceScope _scope;
-            private readonly OSItemIndexDbContext _dbContext;
+            private readonly OsItemIndexDbContext _dbContext;
 
             public DbContextFactory(IServiceScopeFactory scopeFactory)
             {
                 _scope = scopeFactory.CreateScope();
-                _dbContext = _scope.ServiceProvider.GetRequiredService<OSItemIndexDbContext>();
+                _dbContext = _scope.ServiceProvider.GetRequiredService<OsItemIndexDbContext>();
 
                 // Disable tracking on our underlying entities in DbContext
                 // https://docs.microsoft.com/en-us/ef/core/querying/tracking
                 _dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             }
 
-            public OSItemIndexDbContext GetDbContext()
+            public OsItemIndexDbContext GetDbContext()
             {
                 return _dbContext;
             }
