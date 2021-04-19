@@ -1,4 +1,4 @@
-﻿namespace OsItemIndex.Data
+﻿namespace OSItemIndex.Data
 {
     public interface IRealtimePriceModel
     {

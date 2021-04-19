@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace OsItemIndex.Data
+namespace OSItemIndex.Data
 {
     public class RealtimePrice : PriceEntity
     {

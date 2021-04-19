@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace OsItemIndex.Data
+namespace OSItemIndex.Data
 {
     public class WeirdGloopPrice : PriceEntity
     {
