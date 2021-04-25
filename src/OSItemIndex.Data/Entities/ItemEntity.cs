@@ -18,6 +18,6 @@ namespace OSItemIndex.Data
         /// The name of the item.
         /// </summary>
         [JsonPropertyName("name")]
-        public string? Name { get; set; }
+        public string Name { get; set; }
     }
 }

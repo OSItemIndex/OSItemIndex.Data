@@ -23,13 +23,13 @@ namespace OSItemIndex.Data.Database
     ///     IDesignTimeDbContextFactory implementation that's used by design-time services.
     ///     https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.design.idesigntimedbcontextfactory-1?view=efcore-5.0
     /// </summary>
-    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<OSItemIndexDbContext>
+    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<OsItemIndexDbContext>
     {
         /// <summary>
         ///     Creates a new instance of a OSItemIndexDbContext.
         /// </summary>
         /// <returns>A new instance of OSItemIndexDbContext.</returns>
-        public OSItemIndexDbContext CreateDbContext(string[] args) // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#evcp
+        public OsItemIndexDbContext CreateDbContext(string[] args) // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1#evcp
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             var configuration = new ConfigurationBuilder() // TODO Consider consting this somewhere, keep it all in once place, honestly prob not
@@ -42,9 +42,9 @@ namespace OSItemIndex.Data.Database
 
             var connStrBuilder = DatabaseExtensions.NpgsqlConnectionStringFromConfig(configuration);
 
-            var builder = new DbContextOptionsBuilder<OSItemIndexDbContext>()
+            var builder = new DbContextOptionsBuilder<OsItemIndexDbContext>()
                 .UseNpgsql(connStrBuilder.ConnectionString, o => o.CommandTimeout(7200));
-            return new OSItemIndexDbContext(builder.Options);
+            return new OsItemIndexDbContext(builder.Options);
         }
     }
 }

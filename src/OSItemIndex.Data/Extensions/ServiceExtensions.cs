@@ -30,7 +30,7 @@ namespace OSItemIndex.Data.Extensions
         {
             services.AddOptions();
             services.Configure<DbOptions>(configuration.GetSection(DbOptions.Section));
-            services.AddDbContextPool<OSItemIndexDbContext>(builder => builder.UseNpgsql(NpgsqlConnectionStringFromConfig(configuration).ConnectionString));
+            services.AddDbContextPool<OsItemIndexDbContext>(builder => builder.UseNpgsql(NpgsqlConnectionStringFromConfig(configuration).ConnectionString));
             services.AddSingleton<IDbContextHelper, DbContextHelper>();
             return services;
         }
