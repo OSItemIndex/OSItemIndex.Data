@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace OSItemIndex.Data.Database
 {
-    public class OSItemIndexDbContext : DbContext
+    public class OsItemIndexDbContext : DbContext
     {
         public DbSet<OsrsBoxItem> Items { get; set; }
         public DbSet<RealtimePrice> PricesRealtime { get; set; }
 
-        public OSItemIndexDbContext(DbContextOptions<OSItemIndexDbContext> options) : base(options) { }
+        public OsItemIndexDbContext(DbContextOptions<OsItemIndexDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
