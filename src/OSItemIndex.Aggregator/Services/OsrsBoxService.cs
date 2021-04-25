@@ -78,6 +78,7 @@ namespace OSItemIndex.Aggregator.Services
                 var transaction = dbContext.EnsureOrStartTransaction(IsolationLevel.ReadCommitted);
                 try
                 {
+                    const string tempTable = "_temp_items";
                     var sql = "CREATE TEMP TABLE _temp_items (LIKE items INCLUDING DEFAULTS) ON COMMIT DROP";
                     await conn.ExecuteNonQueryAsync(sql); // Create temp table
 
@@ -87,6 +88,10 @@ namespace OSItemIndex.Aggregator.Services
                         ImportFromContentStream(stream, importer);
                         await importer.CompleteAsync();
                     }
+
+                    // Lock table
+                    sql = "LOCK TABLE prices_realtime IN ACCESS EXCLUSIVE MODE";
+                    await conn.ExecuteNonQueryAsync(sql);
 
                     sql = @"INSERT INTO items SELECT * FROM _temp_items ON CONFLICT (id) DO UPDATE SET
                                 id=EXCLUDED.id,

@@ -47,7 +47,8 @@ namespace OSItemIndex.Aggregator
                        {
                            services.AddEntityFrameworkContext(hostingContext.Configuration);
                            services.AddHostedService<DatabaseInitializerService>();
-                           services.AddAggregator<OsrsBoxService>("osrsbox");
+                           //services.AddAggregator<OsrsBoxService>("osrsbox");
+                           services.AddAggregator<PricesRealtimeService>("realtimeprices");
                        });
         }
 
