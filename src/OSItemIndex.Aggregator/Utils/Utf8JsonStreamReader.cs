@@ -1,7 +1,7 @@
 ﻿/**
   * @author     evil-dr-nick
   * @date       2-20-2020
-  * @github     https://github.com/voidwell/Voidwell.DaybreakGames/blob/master/src/Voidwell.DaybreakGames.Data/DbSetExtensions.cs
+  * @github     https://github.com/evil-dr-nick/utf8jsonstreamreader/tree/master/Utf8JsonStreamReader
 */
 
 using System;
