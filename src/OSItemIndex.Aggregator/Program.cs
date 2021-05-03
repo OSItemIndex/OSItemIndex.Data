@@ -1,21 +1,17 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using OSItemIndex.Aggregator.Extensions;
 using OSItemIndex.Aggregator.Services;
-using OSItemIndex.Data.Extensions;
-using OSItemIndex.Data.HostedServices;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
 
 namespace OSItemIndex.Aggregator
 {
-    static class Program
+    internal static class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
                          .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -24,44 +20,32 @@ namespace OSItemIndex.Aggregator
                          .Enrich.WithExceptionDetails()
                          .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
                          .CreateBootstrapLogger();
-            CreateHostBuilder(args).Build().Run();
+
+            var webHost = CreateWebHost(args).Build();
+            using (var scope = webHost.Services.CreateScope()) // Start all IStatefulServices
+            {
+                var servicesController = scope.ServiceProvider.GetRequiredService<IStatefulServiceRepository>();
+                await servicesController.StartServicesAsync();
+            }
+            await webHost.RunAsync();
+
             Log.CloseAndFlush();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
+        public static IHostBuilder CreateWebHost(string[] args)
         {
-            return Host.CreateDefaultBuilder(args)
-                       .ConfigureSerilog()
-                       .ConfigureAppConfiguration((hostingContext, config) =>
+            return Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(builder =>
+            {
+                builder.UseStartup<Startup>()
+                       .UseSerilog((context, configuration) =>
                        {
-                           var env = hostingContext.HostingEnvironment;
-
-                           config.Sources.Clear();
-                           config.SetBasePath(env.ContentRootPath);
-                           config.AddJsonFile("appsettings.json", true, true);
-                           config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", true);
-                           config.AddKeyPerFile("/run/secrets", true); // docker secrets - https://docs.microsoft.com/en-us/dotnet/core/extensions/configuration-providers#key-per-file-configuration-provider
-                           config.AddEnvironmentVariables();
-                       })
-                       .ConfigureServices((hostingContext, services) =>
-                       {
-                           services.AddEntityFrameworkContext(hostingContext.Configuration);
-                           services.AddHostedService<DatabaseInitializerService>();
-                           //services.AddAggregator<OsrsBoxService>("osrsbox");
-                           services.AddAggregator<PricesRealtimeService>("realtimeprices");
+                           configuration.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                                        .Enrich.FromLogContext()
+                                        .Enrich.WithThreadId()
+                                        .Enrich.WithExceptionDetails()
+                                        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"); // {Properties:j}
                        });
-        }
-
-        public static IHostBuilder ConfigureSerilog(this IHostBuilder builder)
-        {
-            builder.ConfigureLogging(logging => { logging.ClearProviders(); }); // remove default providers
-            builder.UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
-                                   .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
-                                   .Enrich.FromLogContext()
-                                   .Enrich.WithThreadId()
-                                   .Enrich.WithExceptionDetails()
-                                   .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")); // {Properties:j}
-            return builder;
+            });
         }
     }
 }

@@ -1,16 +1,9 @@
-﻿using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Npgsql;
+﻿using System.Threading.Tasks;
 
 namespace OSItemIndex.Aggregator.Services
 {
-    public interface IOsrsBoxService
+    public interface IOsrsBoxService : IStatefulService
     {
-        /// <summary>Calls the release-monitoring.org api to GET the pypi osrsbox project details - https://release-monitoring.org/api</summary>
-        Task<ReleaseMonitoringProject?> GetReleaseMonitoringProjectAsync();
-        /// <summary> </summary>
-        Task<HttpResponseMessage> GetFullItemsSummaryResponseAsync();
-        Task AggregateAndBulkCopyItemsAsync();
+        Task AggregateAsync();
     }
 }
