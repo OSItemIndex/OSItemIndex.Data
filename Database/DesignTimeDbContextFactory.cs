@@ -43,7 +43,7 @@ namespace OSItemIndex.Data.Database
             var connStrBuilder = DatabaseExtensions.NpgsqlConnectionStringFromConfig(configuration);
 
             var builder = new DbContextOptionsBuilder<OsItemIndexDbContext>()
-                .UseNpgsql(connStrBuilder.ConnectionString, o => o.CommandTimeout(7200));
+                .UseNpgsql(connStrBuilder.ConnectionString, o => o.CommandTimeout(15));
             return new OsItemIndexDbContext(builder.Options);
         }
     }
