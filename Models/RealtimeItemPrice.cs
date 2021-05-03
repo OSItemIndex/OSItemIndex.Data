@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OSItemIndex.Data
 {
-    public class RealtimePrice : PriceEntity
+    public class RealtimeItemPrice : PriceEntity
     {
         /// <summary>
         ///
