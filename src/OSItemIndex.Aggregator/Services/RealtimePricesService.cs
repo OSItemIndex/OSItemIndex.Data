@@ -30,7 +30,7 @@ namespace OSItemIndex.Aggregator.Services
         private readonly TimeSpan _fiveMinuteInterval = TimeSpan.FromMinutes(5);
         private readonly TimeSpan _oneHourInterval = TimeSpan.FromMinutes(60);
 
-        private readonly IRealtimePricesRepository _repository;
+        private readonly RealtimePriceClient _client;
         private readonly IDbContextHelper _dbContextHelper;
 
         private readonly string _sqlMainTableName;
@@ -40,10 +40,10 @@ namespace OSItemIndex.Aggregator.Services
 
         public override string ServiceName => "realtimeprices";
 
-        public RealtimePricesService(IRealtimePricesRepository repository, IDbContextHelper dbContextHelper)
+        public RealtimePricesService(RealtimePriceClient client, IDbContextHelper dbContextHelper)
         {
             _isWorking = false;
-            _repository = repository;
+            _client = client;
             _dbContextHelper = dbContextHelper;
 
             // Collect information from our dbmodel so we can dynamically construct our sql statements
@@ -52,7 +52,7 @@ namespace OSItemIndex.Aggregator.Services
                 var dbContext = factory.GetDbContext();
 
                 var model = dbContext.Model;
-                var tableEntityType = model.FindEntityType(typeof(RealtimePrice));
+                var tableEntityType = model.FindEntityType(typeof(RealtimeItemPrice));
 
                 _sqlMainTableName = tableEntityType.GetTableName();
                 _sqlTempTableName = $"_temp_{_sqlMainTableName}";
@@ -138,9 +138,9 @@ namespace OSItemIndex.Aggregator.Services
             Log.Information("{@Service} requesting price information [{@RequestType}] from our realtime-prices repository", ServiceName, requestType);
             using var response = await (requestType switch
             {
-                RealtimeRequest.Latest => _repository.GetLatestPricesAsync(),
-                RealtimeRequest.FiveMinute => _repository.GetFiveMinutePricesAsync(),
-                RealtimeRequest.OneHour => _repository.GetOneHourPricesAsync(),
+                RealtimeRequest.Latest => _client.GetRawLatestPricesAsync(),
+                RealtimeRequest.FiveMinute => _client.GetRawFiveMinutePricesAsync(),
+                RealtimeRequest.OneHour => _client.GetRawOneHourPricesAsync(),
                 _ => throw new ArgumentOutOfRangeException(nameof(requestType), requestType, null)
             });
             try

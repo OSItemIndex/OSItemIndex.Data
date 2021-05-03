@@ -6,22 +6,22 @@ using Serilog;
 
 namespace OSItemIndex.Aggregator.Services
 {
-    public class OsrsBoxRepository : IOsrsBoxRepository
+    public class OsrsBoxClient : IOsrsBoxClient
     {
-        private readonly IHttpClientFactory _httpFactory;
+        private HttpClient Client { get; }
 
-        public OsrsBoxRepository(IHttpClientFactory factory)
+        public OsrsBoxClient(HttpClient client)
         {
-            _httpFactory = factory;
+            client.DefaultRequestHeaders.Add("User-Agent", Constants.ObserverUserAgent);
+            Client = client;
         }
 
         public async Task<ReleaseMonitoringProject> GetProjectDetailsAsync()
         {
-            var client = _httpFactory.CreateClient("osrsbox");
             try
             {
                 // GetFromJsonAsync will only return null if there's an exception, which we catch
-                return (await client.GetFromJsonAsync<ReleaseMonitoringProject>(Endpoints.OsrsBox.Project))!;
+                return (await Client.GetFromJsonAsync<ReleaseMonitoringProject>(Endpoints.OsrsBox.Project))!;
             }
             catch (Exception e)
             {
@@ -30,12 +30,11 @@ namespace OSItemIndex.Aggregator.Services
             }
         }
 
-        public async Task<HttpResponseMessage> RequestCompleteItemsAsync()
+        public async Task<HttpResponseMessage> GetRawItemsCompleteAsync()
         {
-            var client = _httpFactory.CreateClient("osrsbox");
             try
             {
-                return await client.GetAsync(Endpoints.OsrsBox.ItemsComplete);
+                return await Client.GetAsync(Endpoints.OsrsBox.ItemsComplete);
             }
             catch (Exception exception)
             {

@@ -30,11 +30,8 @@ namespace OSItemIndex.Aggregator
             services.AddControllers();
             services.AddEntityFrameworkContext(Configuration);
 
-            services.AddHttpClient("osrsbox");
-            services.AddHttpClient("realtimeprices");
-
-            services.AddSingleton<IOsrsBoxRepository, OsrsBoxRepository>();
-            services.AddSingleton<IRealtimePricesRepository, RealtimePricesRepository>();
+            services.AddHttpClient<OsrsBoxClient>();
+            services.AddHttpClient<RealtimePriceClient>();
 
             services.AddSingleton<IOsrsBoxService, OsrsBoxService>();
             services.AddSingleton<IRealtimePricesService, RealtimePricesService>();

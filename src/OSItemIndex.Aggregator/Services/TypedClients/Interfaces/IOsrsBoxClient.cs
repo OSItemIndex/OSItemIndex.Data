@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace OSItemIndex.Aggregator.Services
 {
-    public interface IOsrsBoxRepository
+    public interface IOsrsBoxClient
     {
         Task<ReleaseMonitoringProject> GetProjectDetailsAsync();
-        Task<HttpResponseMessage> RequestCompleteItemsAsync();
+        Task<HttpResponseMessage> GetRawItemsCompleteAsync();
     }
 }

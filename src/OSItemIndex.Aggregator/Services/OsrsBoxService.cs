@@ -22,7 +22,7 @@ namespace OSItemIndex.Aggregator.Services
         private bool _isWorking;
         private readonly TimeSpan _interval = TimeSpan.FromMinutes(60);
 
-        private readonly IOsrsBoxRepository _repository;
+        private readonly OsrsBoxClient _client;
         private readonly IDbContextHelper _dbContextHelper;
 
         private readonly string _sqlCreate;
@@ -32,10 +32,10 @@ namespace OSItemIndex.Aggregator.Services
 
         public override string ServiceName => "osrsbox";
 
-        public OsrsBoxService(IOsrsBoxRepository repository, IDbContextHelper dbContextHelper)
+        public OsrsBoxService(OsrsBoxClient client, IDbContextHelper dbContextHelper)
         {
             _isWorking = false;
-            _repository = repository;
+            _client = client;
             _dbContextHelper = dbContextHelper;
 
             // Collect information from our dbmodel so we can dynamically construct our sql statements
@@ -138,7 +138,7 @@ namespace OSItemIndex.Aggregator.Services
         public async Task AggregateAsync()
         {
             Log.Information("{@Service} requesting items-complete from our osrsbox repository", ServiceName);
-            using var response = await _repository.RequestCompleteItemsAsync();
+            using var response = await _client.GetRawItemsCompleteAsync();
             try
             {
                 response.EnsureSuccessStatusCode();

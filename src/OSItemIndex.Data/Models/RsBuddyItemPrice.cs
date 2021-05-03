@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OSItemIndex.Data
 {
-    public class RsBuddyPrice : PriceEntity
+    public class RsBuddyItemPrice : PriceEntity
     {
         /// <summary>
         /// Store price.
