@@ -27,7 +27,7 @@ namespace OSItemIndex.Data
         public EventType Type { get; set; }
         public EventSource Source { get; set; }
 
-        [Column(TypeName = "json")]
-        public object? Details { get; set; } // manually passed
+        [Column(TypeName = "jsonb")]
+        public object? Details { get; set; }
     }
 }
