@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OSItemIndex.Data
 {
-    public interface IEntity
+    public class Entity
     {
         /// <summary>
         /// Unique OSRS item ID number.
@@ -12,6 +12,6 @@ namespace OSItemIndex.Data
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [JsonPropertyName("id")]
-        int Id { get; set; }
+        public int Id { get; set; }
     }
 }

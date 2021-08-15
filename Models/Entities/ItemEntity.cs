@@ -2,10 +2,8 @@
 
 namespace OSItemIndex.Data
 {
-    public class ItemEntity : IEntity
+    public class ItemEntity : Entity
     {
-        public int Id { get; set; }
-
         /// <summary>
         /// The name of the item.
         /// </summary>
